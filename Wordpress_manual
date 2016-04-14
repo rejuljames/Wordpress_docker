@@ -1,0 +1,73 @@
+===========================================================================================================================================
+				Manual for Installation and configuration of wordpress docker container
+============================================================================================================================================
+
+Docker
+--------
+Docker is an open-source project that automates the deployment of applications inside software containers, 
+by providing an additional layer of abstraction and automation of operating-system-level virtualization on Linux.
+
+Wordpress
+---------
+WordPress is a free and open-source content management system (CMS) based on PHP and MySQL. 
+WordPress is installed on a web server, which either is part of an Internet hosting service or is a network host itself
+
+Installation
+-------------
+
+Host Configuration
+------------------
+Server: Amazon AWS T2.Micro Instance
+Operating system: Ubuntu Trusty 14.04
+Processor:  Intel Xeon Processors 3.3 GHZ
+Memory: 512 MB
+Disk:10GB
+Kernel Version:3.13.0-74-generic
+
+Docker Service Installation
+------------------------------
+Commands:
+sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D // GPG KEY for accessing docker repo
+sudo vim /etc/apt/sources.list.d/docker.list
+	add the following repo details
+	deb https://apt.dockerproject.org/repo ubuntu-trusty main // repository URL
+	
+sudo apt-get update // update new repository link apt-cache
+sudo apt-get install docker-engine // Install the docker service
+sudo service docker-engine start // Start the docker service
+
+MySQL container Installation
+-------------------------------
+Commands:
+sudo docker run --name MySQL -e MYSQL_ROOT_PASSWORD=$password -d mysql:2.6
+	--name : MySQL database name // container name
+	-e : set enviornment variables. MySQL DBname and root for the password will be set. password will taken home enviornment variables
+	-d`: Image name to pull from repository. :2.6  MySQL DB version
+	
+WordPress container Installation
+--------------------------------
+Command:
+sudo docker run --name wordpress --link MySQL:mysql -p 80:80 -d wordpress
+	--name : Wordpress container name
+	--link : Use previous configured MySQL container
+	-p: Port mapping // Default wordpress will be running in port 80. In order to access wordpress from outside the we use port mapping. Any request coming 
+		in port 80 in host machine will be redirected port 80 of wordpress container
+		
+	-d : Pull wordpress image from repository
+	
+Docker commands
+----------------
+
+* docker images // list all the container images in host and size of images
+* docker ps -a // List all the containers in host
+* docker inspect $CID // $CID container ID. List properties of container
+* docker rm $CID // remove containers
+* docker rmi $CID // remove container images
+
+Bash script
+----------------- 
+
+Script to get memory utiliztion of containers
+
+for line in `docker ps | awk '{print $1}' | grep -v CONTAINER`; do docker ps | grep $line | awk '{printf $NF" "}' 
+	&& echo $(( `cat /sys/fs/cgroup/memory/docker/$line*/memory.usage_in_bytes` / 1024 / 1024 ))MB ; done
