@@ -24,6 +24,6 @@ Kernel Version:3.13.0-74-generic<br />
 
 # URL to access the wordpress 
 
-http://ec2-52-32-219-81.us-west-2.compute.amazonaws.com/
+http://ec2-52-32-219-81.us-west-2.compute.amazonaws.com/wp-login.php
 
 
